@@ -26,19 +26,19 @@ func getSession(r *http.Request) *sessions.Session {
 }
 
 func main() {
-	err := godotenv.Load()
-	if err != nil {
-		log.Fatal("Error loading .env file")
+	// Coba load .env kalau ada, tapi kalau nggak ada, lanjut pakai Railway env
+	if err := godotenv.Load(); err != nil {
+		log.Println("⚠️ No .env file found, using system environment variables")
 	}
 
 	token := os.Getenv("HUGGINGFACE_TOKEN")
 	if token == "" {
-		log.Fatal("HUGGINGFACE_TOKEN is not set in the .env file")
+		log.Fatal("❌ HUGGINGFACE_TOKEN is not set (check Railway Variables)")
 	}
 
 	newtoken := os.Getenv("COHORE_TOKEN")
 	if newtoken == "" {
-		log.Fatal("COHORE_TOKEN is not set in the .env file")
+		log.Fatal("❌ COHORE_TOKEN is not set (check Railway Variables)")
 	}
 
 	router := mux.NewRouter()
