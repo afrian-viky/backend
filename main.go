@@ -93,7 +93,7 @@ func main() {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(response)
-	}).Methods("POST")
+	}).Methods("POST", "OPTIONS")
 
 	router.HandleFunc("/chat", func(w http.ResponseWriter, r *http.Request) {
 		if r.Header.Get("Content-Type") != "application/json" {
@@ -127,13 +127,31 @@ func main() {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		json.NewEncoder(w).Encode(response)
-	}).Methods("POST")
+	}).Methods("POST", "OPTIONS")
 
-	// Enable CORS
+	// PERBAIKAN UTAMA: Enable CORS dengan konfigurasi yang benar
 	corsHandler := cors.New(cors.Options{
-		AllowedOrigins: []string{"http://localhost:3000"}, // Allow your React app's origin
-		AllowedMethods: []string{"GET", "POST", "PUT", "DELETE", "OPTIONS"},
-		AllowedHeaders: []string{"Content-Type", "Authorization"},
+		AllowedOrigins: []string{
+			"http://localhost:3000",           // Development
+			"https://smartdata-ai.vercel.app", // Production Vercel
+			"https://*.vercel.app",            // Semua subdomain Vercel
+		},
+		AllowedMethods: []string{
+			"GET", 
+			"POST", 
+			"PUT", 
+			"DELETE", 
+			"OPTIONS",
+		},
+		AllowedHeaders: []string{
+			"Content-Type", 
+			"Authorization",
+			"Accept",
+			"Origin",
+			"X-Requested-With",
+		},
+		AllowCredentials: true, // Penting untuk cookies/sessions
+		Debug: true, // Enable debugging untuk development
 	}).Handler(router)
 
 	// Start the server
@@ -141,6 +159,7 @@ func main() {
 	if port == "" {
 		port = "8080"
 	}
-	log.Printf("Server running on port %s\n", port)
+	log.Printf("🚀 Server running on port %s", port)
+	log.Printf("🌐 CORS enabled for: localhost:3000, smartdata-ai.vercel.app")
 	log.Fatal(http.ListenAndServe(":"+port, corsHandler))
 }
